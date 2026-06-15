@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Users, Star, LogOut, LayoutDashboard, CalendarCheck } from 'lucide-react';
+import { Users, Star, LogOut, LayoutDashboard, CalendarCheck, MonitorPlay } from 'lucide-react';
 import Button from '../../components/ui/Button';
 
 const DashboardLayout = () => {
@@ -18,6 +18,7 @@ const DashboardLayout = () => {
     { path: '/dashboard/evaluation', label: 'التقييم اليومي', icon: CalendarCheck },
     { path: '/dashboard/children', label: 'إدارة الأبناء', icon: Users },
     { path: '/dashboard/achievements', label: 'إدارة الإنجازات', icon: Star },
+    { path: '/dashboard/kiosk', label: 'ربط الشاشة', icon: MonitorPlay },
   ];
 
   return (
@@ -52,7 +53,7 @@ const DashboardLayout = () => {
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#f0e6de]">
+        <div className="p-4 border-t border-[#f0e6de] flex flex-col gap-4">
           <Button 
             variant="danger" 
             className="w-full gap-2" 
@@ -61,6 +62,9 @@ const DashboardLayout = () => {
             <LogOut size={20} />
             <span>تسجيل الخروج</span>
           </Button>
+          <div className="text-center text-[#a99c92] text-sm font-bold">
+            تم التطوير بحب من قبل <a href="https://ruman.sa" target="_blank" rel="noopener noreferrer" className="text-[#49b5d0] hover:text-[#f0a63e] transition-colors">وكالة رمان</a>
+          </div>
         </div>
       </aside>
 

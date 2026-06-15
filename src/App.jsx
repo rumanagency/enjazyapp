@@ -6,6 +6,9 @@ import DashboardLayout from './pages/Dashboard/Layout';
 import ChildrenManager from './pages/Dashboard/ChildrenManager';
 import AchievementsManager from './pages/Dashboard/AchievementsManager';
 import DailyEvaluation from './pages/Dashboard/DailyEvaluation';
+import KioskManager from './pages/Dashboard/KioskManager';
+import KioskPairing from './pages/Kiosk/KioskPairing';
+import KioskDisplay from './pages/Kiosk/KioskDisplay';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -43,9 +46,11 @@ const MainApp = () => {
         <Route path="evaluation" element={<DailyEvaluation />} />
         <Route path="children" element={<ChildrenManager />} />
         <Route path="achievements" element={<AchievementsManager />} />
+        <Route path="kiosk" element={<KioskManager />} />
       </Route>
 
-      <Route path="/kiosk" element={<div>شاشة العرض الرئيسية سيتم بناؤها لاحقاً</div>} />
+      <Route path="/kiosk" element={<KioskPairing />} />
+      <Route path="/kiosk/display" element={<KioskDisplay />} />
     </Routes>
   );
 };

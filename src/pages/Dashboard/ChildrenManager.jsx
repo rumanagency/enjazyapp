@@ -10,7 +10,7 @@ const ChildrenManager = () => {
   const { user } = useAuth();
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ name: '', avatar_url: '' });
+  const [formData, setFormData] = useState({ name: '', avatar_url: '', kiosk_duration: 10 });
   const [editingId, setEditingId] = useState(null);
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -65,7 +65,7 @@ const ChildrenManager = () => {
       if (editingId) {
         const { error } = await supabase
           .from('children')
-          .update({ name: formData.name, avatar_url: finalAvatarUrl })
+          .update({ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration })
           .eq('id', editingId);
         if (error) throw error;
       } else {
@@ -75,7 +75,7 @@ const ChildrenManager = () => {
         }
         const { error } = await supabase
           .from('children')
-          .insert([{ name: formData.name, avatar_url: finalAvatarUrl, parent_id: user.id }]);
+          .insert([{ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration, parent_id: user.id }]);
         if (error) throw error;
       }
       resetForm();
@@ -89,14 +89,14 @@ const ChildrenManager = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', avatar_url: '' });
+    setFormData({ name: '', avatar_url: '', kiosk_duration: 10 });
     setEditingId(null);
     setFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleEdit = (child) => {
-    setFormData({ name: child.name, avatar_url: child.avatar_url || '' });
+    setFormData({ name: child.name, avatar_url: child.avatar_url || '', kiosk_duration: child.kiosk_duration || 10 });
     setEditingId(child.id);
     setFile(null);
   };
@@ -128,16 +128,28 @@ const ChildrenManager = () => {
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row gap-4 items-end">
-            <Input
-              id="name"
-              label="اسم الابن"
-              placeholder="مثال: أحمد"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className="flex-1"
-            />
-            <div className="flex-1 flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-4 flex-1">
+              <Input
+                id="name"
+                label="اسم الابن"
+                placeholder="مثال: أحمد"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+              <Input
+                id="kiosk_duration"
+                type="number"
+                min="5"
+                max="300"
+                label="مدة العرض بالشاشة (ثواني)"
+                placeholder="10"
+                value={formData.kiosk_duration}
+                onChange={(e) => setFormData({ ...formData, kiosk_duration: parseInt(e.target.value) || 10 })}
+                required
+              />
+            </div>
+            <div className="flex-1 flex flex-col gap-2 w-full justify-start">
               <label className="text-[#352c3c] font-bold text-lg px-2">رابط الصورة (اختياري)</label>
               <div className="flex gap-2">
                 <input
@@ -209,6 +221,7 @@ const ChildrenManager = () => {
                 )}
               </div>
               <h3 className="text-2xl font-bold text-[#352c3c]">{child.name}</h3>
+              <p className="text-sm text-[#a99c92] font-bold">مدة العرض بالشاشة: {child.kiosk_duration || 10} ثواني</p>
               
               <div className="flex gap-2 w-full mt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => handleEdit(child)}>
