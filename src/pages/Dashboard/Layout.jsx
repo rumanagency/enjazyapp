@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Users, Star, LogOut, LayoutDashboard } from 'lucide-react';
+import { Users, Star, LogOut, LayoutDashboard, CalendarCheck } from 'lucide-react';
 import Button from '../../components/ui/Button';
 
 const DashboardLayout = () => {
@@ -15,6 +15,7 @@ const DashboardLayout = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'اللوحة الرئيسية', icon: LayoutDashboard, end: true },
+    { path: '/dashboard/evaluation', label: 'التقييم اليومي', icon: CalendarCheck },
     { path: '/dashboard/children', label: 'إدارة الأبناء', icon: Users },
     { path: '/dashboard/achievements', label: 'إدارة الإنجازات', icon: Star },
   ];

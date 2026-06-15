@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import DashboardLayout from './pages/Dashboard/Layout';
 import ChildrenManager from './pages/Dashboard/ChildrenManager';
 import AchievementsManager from './pages/Dashboard/AchievementsManager';
+import DailyEvaluation from './pages/Dashboard/DailyEvaluation';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -39,6 +40,7 @@ const MainApp = () => {
         }
       >
         <Route index element={<div className="text-center p-10"><h2 className="text-2xl font-bold text-[#49b5d0]">أهلاً بك في لوحة تحكم الآباء!</h2><p className="mt-4 text-[#352c3c]">من هنا يمكنك إدارة أبنائك وإنجازاتهم، وستتمكن من تقييمهم يومياً.</p></div>} />
+        <Route path="evaluation" element={<DailyEvaluation />} />
         <Route path="children" element={<ChildrenManager />} />
         <Route path="achievements" element={<AchievementsManager />} />
       </Route>
