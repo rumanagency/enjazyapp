@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kid-primary: #49b5d0;
+  --color-kid-secondary: #f0a63e;
+  --color-kid-success: #488b40;
+  --color-kid-danger: #c15b40;
+  --color-kid-bg-light: #faece3;
+  --color-kid-bg-dark: #352c3c;
+  --color-kid-text-light: #333333;
+  --color-kid-text-dark: #ffffff;
+  --font-aref: "Baloo Bhaijaan 2", sans-serif;
+}
+
+body {
+  font-family: 'Baloo Bhaijaan 2', sans-serif;
+  direction: rtl;
+}
