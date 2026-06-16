@@ -13,6 +13,8 @@ const DashboardLayout = () => {
     navigate('/login');
   };
 
+  const isSuperAdmin = user?.user_metadata?.is_super_admin === true;
+
   const navItems = [
     { path: '/dashboard', label: 'اللوحة الرئيسية', icon: LayoutDashboard, end: true },
     { path: '/dashboard/evaluation', label: 'التقييم اليومي', icon: CalendarCheck },
@@ -20,6 +22,10 @@ const DashboardLayout = () => {
     { path: '/dashboard/achievements', label: 'إدارة الإنجازات', icon: Star },
     { path: '/dashboard/kiosk', label: 'ربط الشاشة', icon: MonitorPlay },
   ];
+
+  if (isSuperAdmin) {
+    navItems.push({ path: '/dashboard/admin', label: 'إدارة الآباء (سوبر أدمن)', icon: Users });
+  }
 
   return (
     <div className="min-h-screen bg-[#faece3] flex flex-col md:flex-row">

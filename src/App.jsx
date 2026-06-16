@@ -7,6 +7,7 @@ import ChildrenManager from './pages/Dashboard/ChildrenManager';
 import AchievementsManager from './pages/Dashboard/AchievementsManager';
 import DailyEvaluation from './pages/Dashboard/DailyEvaluation';
 import KioskManager from './pages/Dashboard/KioskManager';
+import AdminManager from './pages/Dashboard/AdminManager';
 import KioskPairing from './pages/Kiosk/KioskPairing';
 import KioskDisplay from './pages/Kiosk/KioskDisplay';
 
@@ -47,6 +48,7 @@ const MainApp = () => {
         <Route path="children" element={<ChildrenManager />} />
         <Route path="achievements" element={<AchievementsManager />} />
         <Route path="kiosk" element={<KioskManager />} />
+        <Route path="admin" element={<AdminManager />} />
       </Route>
 
       <Route path="/kiosk" element={<KioskPairing />} />
