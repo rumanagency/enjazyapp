@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import confetti from 'canvas-confetti';
 import { Star, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const DailyEvaluation = () => {
   const { user } = useAuth();
@@ -12,6 +13,7 @@ const DailyEvaluation = () => {
   const [activeChild, setActiveChild] = useState(null);
   const [achievements, setAchievements] = useState([]);
   const [dailyRecords, setDailyRecords] = useState([]);
+  const [weeklyRecords, setWeeklyRecords] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Audio references
@@ -41,6 +43,7 @@ const DailyEvaluation = () => {
       const { data, error } = await supabase
         .from('children')
         .select('*')
+        .eq('parent_id', user.id)
         .order('created_at', { ascending: true });
       
       if (error) throw error;
@@ -79,15 +82,29 @@ const DailyEvaluation = () => {
       }
       setAchievements(achData);
 
-      const today = getToday();
+      const getStartOfWeek = () => {
+        const d = new Date();
+        d.setDate(d.getDate() - d.getDay()); // Sunday
+        return d;
+      };
+
+      const startOfWeek = getStartOfWeek();
+      const child = children.find(c => c.id === childId);
+      const resetTimestamp = child?.path_reset_timestamp ? new Date(child.path_reset_timestamp) : new Date(0);
+      const effectiveStartDate = resetTimestamp > startOfWeek ? resetTimestamp : startOfWeek;
+      const effectiveStartDateStr = `${effectiveStartDate.getFullYear()}-${String(effectiveStartDate.getMonth() + 1).padStart(2, '0')}-${String(effectiveStartDate.getDate()).padStart(2, '0')}`;
+
       const { data: recordsData, error: recordsError } = await supabase
         .from('daily_records')
         .select('*')
         .eq('child_id', childId)
-        .eq('date', today);
+        .gte('date', effectiveStartDateStr);
       
       if (recordsError) throw recordsError;
-      setDailyRecords(recordsData || []);
+      
+      setWeeklyRecords(recordsData || []);
+      const today = getToday();
+      setDailyRecords((recordsData || []).filter(r => r.date === today));
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -150,6 +167,7 @@ const DailyEvaluation = () => {
 
       if (data && data.length > 0) {
         setDailyRecords(prev => [...prev, data[0]]);
+        setWeeklyRecords(prev => [...prev, data[0]]);
       } else {
         // Fallback
         fetchAchievementsAndRecords(activeChild.id);
@@ -180,6 +198,7 @@ const DailyEvaluation = () => {
          return;
       }
       setDailyRecords(prev => prev.filter(r => r.id !== recordId));
+      setWeeklyRecords(prev => prev.filter(r => r.id !== recordId));
     } catch (error) {
       alert('حدث خطأ غير متوقع: ' + error.message);
     }
@@ -210,6 +229,11 @@ const DailyEvaluation = () => {
     }
     return <div className="flex gap-2 justify-center my-3">{marks}</div>;
   };
+
+  const progress = Math.max(0, weeklyRecords.filter(r => r.status === 'star').length - weeklyRecords.filter(r => r.status === 'cross').length);
+  const weeklyGoal = activeChild?.weekly_star_goal || 10;
+  const progressPercentage = Math.min(100, Math.max(0, (progress / weeklyGoal) * 100));
+  const isCompleted = progressPercentage >= 100;
 
   return (
     <div className="space-y-6 relative">
@@ -245,6 +269,57 @@ const DailyEvaluation = () => {
               </button>
             ))}
           </div>
+
+          {!loading && activeChild && (
+            <Card className="my-6 relative overflow-hidden bg-white shadow-sm border-2 border-[#e2d5cc]">
+              <div className="flex justify-between items-end mb-2 px-2">
+                <span className="font-bold text-[clamp(0.9rem,3vw,1.2rem)] text-[#f0a63e]">مسار إنجاز {activeChild.name}</span>
+                <span className="font-bold text-[clamp(0.9rem,3vw,1.2rem)] text-[#a99c92]">{progress} / {weeklyGoal}</span>
+              </div>
+              
+              <div className="relative w-full h-4 md:h-6 bg-[#f0e6de] rounded-full mt-4 border-2 border-[#e2d5cc]">
+                {/* خط التقدم */}
+                <motion.div 
+                  className="absolute top-0 right-0 h-full bg-gradient-to-l from-[#f0a63e] to-[#f4c88a] rounded-full"
+                  initial={false}
+                  animate={{ width: `${progressPercentage}%` }}
+                  transition={{ type: "spring", stiffness: 50, damping: 10 }}
+                />
+
+                {/* الأرنب */}
+                <motion.div 
+                  className="absolute top-1/2 z-10 w-[clamp(2.5rem,6vh,4.5rem)] h-[clamp(2.5rem,6vh,4.5rem)] md:w-[3.5rem] md:h-[3.5rem]"
+                  initial={false}
+                  animate={{ 
+                    right: `${progressPercentage}%`,
+                    x: '50%',
+                    y: '-50%',
+                    opacity: isCompleted ? 0 : 1,
+                    scale: isCompleted ? 0.5 : 1
+                  }}
+                  transition={{ type: "spring", stiffness: 50, damping: 10 }}
+                >
+                  <img src="/assets/img/Rabbit Kick Scooter.svg" alt="Rabbit" className="w-full h-full object-contain drop-shadow-md" style={{ transform: 'scaleX(-1)' }} />
+                </motion.div>
+                
+                {/* الميدالية */}
+                <motion.div 
+                  className="absolute top-1/2 left-0 z-20 w-[clamp(3rem,7.5vh,5rem)] h-[clamp(3rem,7.5vh,5rem)] md:w-[4rem] md:h-[4rem] bg-white rounded-full p-1.5 shadow-md border-2 md:border-4 flex items-center justify-center"
+                  initial={false}
+                  animate={{
+                    x: '-50%',
+                    y: '-50%',
+                    scale: isCompleted ? 1.15 : 1,
+                    borderColor: isCompleted ? '#488b40' : '#f0a63e',
+                    boxShadow: isCompleted ? '0 10px 25px -5px rgba(72,139,64,0.4)' : '0 4px 6px -1px rgba(0,0,0,0.1)'
+                  }}
+                  transition={{ type: "spring", stiffness: 50, damping: 10 }}
+                >
+                  <img src="/assets/img/medal.png" alt="Medal" className="w-full h-full object-contain" />
+                </motion.div>
+              </div>
+            </Card>
+          )}
 
           {loading ? (
             <div className="text-center text-[#a99c92] font-bold py-10">جاري التحميل...</div>

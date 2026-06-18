@@ -10,7 +10,7 @@ const ChildrenManager = () => {
   const { user } = useAuth();
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ name: '', avatar_url: '', kiosk_duration: 10 });
+  const [formData, setFormData] = useState({ name: '', avatar_url: '', kiosk_duration: 10, weekly_star_goal: 10 });
   const [editingId, setEditingId] = useState(null);
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -25,6 +25,7 @@ const ChildrenManager = () => {
       const { data, error } = await supabase
         .from('children')
         .select('*')
+        .eq('parent_id', user.id)
         .order('created_at', { ascending: true });
       if (error) throw error;
       setChildren(data || []);
@@ -65,7 +66,7 @@ const ChildrenManager = () => {
       if (editingId) {
         const { error } = await supabase
           .from('children')
-          .update({ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration })
+          .update({ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration, weekly_star_goal: formData.weekly_star_goal })
           .eq('id', editingId);
         if (error) throw error;
       } else {
@@ -75,7 +76,7 @@ const ChildrenManager = () => {
         }
         const { error } = await supabase
           .from('children')
-          .insert([{ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration, parent_id: user.id }]);
+          .insert([{ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration, weekly_star_goal: formData.weekly_star_goal, parent_id: user.id }]);
         if (error) throw error;
       }
       resetForm();
@@ -89,14 +90,14 @@ const ChildrenManager = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', avatar_url: '', kiosk_duration: 10 });
+    setFormData({ name: '', avatar_url: '', kiosk_duration: 10, weekly_star_goal: 10 });
     setEditingId(null);
     setFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleEdit = (child) => {
-    setFormData({ name: child.name, avatar_url: child.avatar_url || '', kiosk_duration: child.kiosk_duration || 10 });
+    setFormData({ name: child.name, avatar_url: child.avatar_url || '', kiosk_duration: child.kiosk_duration || 10, weekly_star_goal: child.weekly_star_goal || 10 });
     setEditingId(child.id);
     setFile(null);
   };
@@ -110,6 +111,22 @@ const ChildrenManager = () => {
     } catch (error) {
       console.error('Error deleting child:', error);
       alert('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const handleResetPath = async (id) => {
+    if (!window.confirm('هل أنت متأكد من تصفير مسار الإنجاز؟ سيبدأ العد من الصفر دون حذف النجوم السابقة.')) return;
+    try {
+      const { error } = await supabase
+        .from('children')
+        .update({ path_reset_timestamp: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw error;
+      alert('تم تصفير المسار بنجاح!');
+      fetchChildren();
+    } catch (error) {
+      console.error('Error resetting path:', error);
+      alert('حدث خطأ أثناء تصفير المسار');
     }
   };
 
@@ -137,17 +154,32 @@ const ChildrenManager = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
-              <Input
-                id="kiosk_duration"
-                type="number"
-                min="5"
-                max="300"
-                label="مدة العرض بالشاشة (ثواني)"
-                placeholder="10"
-                value={formData.kiosk_duration}
-                onChange={(e) => setFormData({ ...formData, kiosk_duration: parseInt(e.target.value) || 10 })}
-                required
-              />
+              <div className="flex gap-4">
+                <Input
+                  id="kiosk_duration"
+                  type="number"
+                  min="5"
+                  max="300"
+                  label="مدة العرض بالشاشة (ثواني)"
+                  placeholder="10"
+                  value={formData.kiosk_duration}
+                  onChange={(e) => setFormData({ ...formData, kiosk_duration: parseInt(e.target.value) || 10 })}
+                  required
+                  className="flex-1"
+                />
+                <Input
+                  id="weekly_star_goal"
+                  type="number"
+                  min="1"
+                  max="100"
+                  label="هدف النجوم الأسبوعي"
+                  placeholder="10"
+                  value={formData.weekly_star_goal}
+                  onChange={(e) => setFormData({ ...formData, weekly_star_goal: parseInt(e.target.value) || 10 })}
+                  required
+                  className="flex-1"
+                />
+              </div>
             </div>
             <div className="flex-1 flex flex-col gap-2 w-full justify-start">
               <label className="text-[#352c3c] font-bold text-lg px-2">رابط الصورة (اختياري)</label>
@@ -224,10 +256,13 @@ const ChildrenManager = () => {
               <p className="text-sm text-[#a99c92] font-bold">مدة العرض بالشاشة: {child.kiosk_duration || 10} ثواني</p>
               
               <div className="flex gap-2 w-full mt-2">
-                <Button variant="secondary" className="flex-1" onClick={() => handleEdit(child)}>
+                <Button variant="outline" className="flex-1 text-[#f0a63e] border-[#f0a63e] hover:bg-[#f0a63e]/10 whitespace-nowrap px-2" onClick={() => handleResetPath(child.id)}>
+                  تصفير المسار
+                </Button>
+                <Button variant="secondary" className="px-3" onClick={() => handleEdit(child)}>
                   <Pencil size={18} />
                 </Button>
-                <Button variant="danger" className="flex-1" onClick={() => handleDelete(child.id)}>
+                <Button variant="danger" className="px-3" onClick={() => handleDelete(child.id)}>
                   <Trash2 size={18} />
                 </Button>
               </div>

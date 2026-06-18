@@ -3,6 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
 
+const getDeviceInfo = () => {
+  const ua = navigator.userAgent;
+  if (/SmartTV|AppleTV|Roku|Fire|Xbox|PlayStation|Tizen|WebOS/i.test(ua)) return 'شاشة ذكية / تلفاز';
+  if (/iPad|Android(?!.*Mobile)|Tablet/i.test(ua)) return 'جهاز لوحي (تابلت)';
+  if (/Mobile|iPhone|Android/i.test(ua)) return 'هاتف ذكي';
+  if (/Windows|Macintosh|Linux/i.test(ua)) return 'جهاز كمبيوتر';
+  return 'جهاز غير معروف';
+};
+
 const KioskPairing = () => {
   const [pairingCode, setPairingCode] = useState('');
   const [sessionId, setSessionId] = useState(null);
@@ -35,6 +44,7 @@ const KioskPairing = () => {
         if (payload.new.parent_id) {
           // تم الربط بنجاح!
           localStorage.setItem('kiosk_parent_id', payload.new.parent_id);
+          localStorage.setItem('kiosk_session_id', payload.new.id);
           navigate('/kiosk/display');
         }
       })
@@ -52,7 +62,7 @@ const KioskPairing = () => {
       
       const { data, error } = await supabase
         .from('kiosk_sessions')
-        .insert([{ code }])
+        .insert([{ code, device_info: getDeviceInfo() }])
         .select()
         .single();
 

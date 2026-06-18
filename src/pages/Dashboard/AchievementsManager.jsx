@@ -25,18 +25,23 @@ const AchievementsManager = () => {
 
   const fetchData = async () => {
     try {
-      const [achData, childData, linkData] = await Promise.all([
-        supabase.from('achievements').select('*').order('created_at', { ascending: true }),
-        supabase.from('children').select('*').order('created_at', { ascending: true }),
-        supabase.from('child_achievements').select('*')
+      const { data: childData, error: childError } = await supabase.from('children').select('*').eq('parent_id', user.id).order('created_at', { ascending: true });
+      if (childError) throw childError;
+      
+      const childIds = childData.map(c => c.id);
+
+      const [achData, linkData] = await Promise.all([
+        supabase.from('achievements').select('*').eq('parent_id', user.id).order('created_at', { ascending: true }),
+        childIds.length > 0 
+          ? supabase.from('child_achievements').select('*').in('child_id', childIds) 
+          : Promise.resolve({ data: [] })
       ]);
 
       if (achData.error) throw achData.error;
-      if (childData.error) throw childData.error;
       if (linkData.error) throw linkData.error;
 
       setAchievements(achData.data || []);
-      setChildren(childData.data || []);
+      setChildren(childData || []);
       setChildAchievements(linkData.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
