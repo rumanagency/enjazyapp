@@ -31,9 +31,9 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-[#faece3] flex flex-col md:flex-row">
       {/* Sidebar / Topbar */}
       <aside className="w-full md:w-72 bg-white border-b md:border-b-0 md:border-l border-[#f0e6de] flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] z-10">
-        <div className="p-6 text-center border-b border-[#f0e6de]">
-          <h2 className="text-3xl font-bold text-[#49b5d0]">إنجازي</h2>
-          <p className="text-[#f0a63e] font-bold mt-1 text-sm">لوحة تحكم الآباء</p>
+        <div className="p-6 flex flex-col items-center justify-center text-center border-b border-[#f0e6de]">
+          <img src="/assets/enjazy_logo.svg" alt="إنجازي" className="h-12 w-auto object-contain" />
+          <p className="text-[#f0a63e] font-bold mt-2 text-sm">لوحة تحكم الآباء</p>
         </div>
         
         <nav className="flex-1 p-4 space-y-2 flex flex-row md:flex-col overflow-x-auto md:overflow-visible">

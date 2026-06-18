@@ -87,8 +87,9 @@ const KioskPairing = () => {
   return (
     <div className="min-h-screen bg-[#faece3] flex items-center justify-center p-8" dir="rtl">
       <div className="bg-white rounded-[3rem] shadow-xl p-12 max-w-2xl w-full text-center space-y-12">
-        <div>
-          <h1 className="text-4xl font-black text-[#352c3c] mb-4">ربط شاشة إنجازي</h1>
+        <div className="flex flex-col items-center">
+          <img src="/assets/enjazy_logo.svg" alt="إنجازي" className="h-20 w-auto object-contain mb-6 drop-shadow-sm" />
+          <h1 className="text-4xl font-black text-[#352c3c] mb-4">ربط الشاشة</h1>
           <p className="text-[#a99c92] text-xl">
             افتح تطبيق إنجازي في جوالك، واذهب إلى الإعدادات ثم "ربط الشاشة"، وأدخل الكود التالي:
           </p>

@@ -45,8 +45,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-[#faece3] flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#49b5d0] mb-2">تطبيق إنجازي</h1>
+        <div className="flex flex-col items-center justify-center text-center mb-8">
+          <img src="/assets/enjazy_logo.svg" alt="إنجازي" className="h-20 w-auto object-contain mb-4 drop-shadow-sm" />
           <p className="text-[#f0a63e] font-bold text-lg">لوحة تحكم الآباء</p>
         </div>
 
