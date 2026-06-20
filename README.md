@@ -115,6 +115,9 @@ npm run dev
 
 تم تصميم وبرمجة هذا النظام بواسطة **صالح** من **وكالة رمان (Ruman Agency)**.
 
+**المساهمون (Contributors):**
+- [alrkiyan](https://github.com/alrkiyan)
+
 - 📧 **البريد الإلكتروني:** [hi@ruman.sa](mailto:hi@ruman.sa)
 - 📱 **واتساب:** [+966539294989](https://wa.me/966539294989)
 - 🌐 **الموقع الإلكتروني:** [https://ruman.sa](https://ruman.sa)
