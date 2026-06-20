@@ -16,6 +16,10 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 
+<div align="center">
+  <img src="public/assets/screenshots/enjazy_header.png" alt="إنجازي - منصة الآباء" width="100%" style="border-radius: 16px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" />
+</div>
+
 **إنجازي** هو نظام تفاعلي متكامل يتكون من (لوحة تحكم ذكية للآباء + شاشة عرض تفاعلية للأطفال) صُمم خصيصاً لمساعدة الآباء على متابعة وتطوير إنجازات أطفالهم اليومية بأسلوب محفز، عصري، وطفولي مبهج.
 
 ## ✨ مميزات النظام والخصائص الكاملة
@@ -26,12 +30,22 @@
 - **إدارة الآباء:** السوبر أدمن هو الحساب الوحيد المخول بإنشاء حسابات جديدة للآباء وتعديلها أو حذفها.
 
 ### 2. لوحة تحكم الآباء (Parent Dashboard)
+
+<div align="center">
+  <img src="public/assets/screenshots/5.png" alt="شاشة تسجيل الدخول" width="400" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
+</div>
+
 - **اللوحة الرئيسية (Dashboard Home):** واجهة متكاملة تعرض إحصائيات عامة عن الأبناء، وتتضمن تبويباً لإدارة الحساب (تعديل الإيميل وكلمة المرور)، وتبويباً مخصصاً لإدارة الشاشات.
+  <br/><img src="public/assets/screenshots/1.png" alt="اللوحة الرئيسية" width="600" style="border-radius: 8px; margin-top: 10px;" />
+  
 - **إدارة الأبناء (Children Manager):** إمكانية إضافة حتى 5 أبناء، تحديد هدف النجوم الأسبوعي، مدة ظهور الابن على شاشة العرض (بالثواني)، وتخصيص صورة شخصية للابن وصورة للإنجاز (الميدالية النهائية).
+  <br/><img src="public/assets/screenshots/3.png" alt="إدارة الأبناء" width="600" style="border-radius: 8px; margin-top: 10px;" />
 - **تصفير مسار الإنجاز:** إمكانية إعادة ضبط مسار الإنجاز ليبدأ الأرنب من نقطة البداية دون حذف النجوم أو السجلات السابقة، حيث يعتمد المسار على وقت التصفير لحساب النجوم الجديدة.
 - **إدارة الإنجازات (Achievements Manager):** إضافة مهام وإنجازات يومية مع صور تعبيرية، وتخصيص الإنجازات لأبناء محددين.
+  <br/><img src="public/assets/screenshots/4.png" alt="إدارة الإنجازات" width="600" style="border-radius: 8px; margin-top: 10px;" />
 - **التقييم اليومي (Daily Evaluation):** واجهة مريحة وسريعة لتقييم كل ابن يومياً (نجمة أو إكس) كحد أقصى 5 تقييمات للإنجاز الواحد في اليوم. وتتضمن الواجهة عرض حي لـ "مسار الإنجاز" متطابق مع الشاشة التفاعلية.
 - **إدارة شاشات العرض (Kiosk Manager):** ربط أجهزة العرض بسهولة عبر رمز PIN أو QR Code، مدمجة الآن كعلامة تبويب داخل اللوحة الرئيسية لسهولة الوصول.
+  <br/><img src="public/assets/screenshots/2.png" alt="ربط الشاشة الذكية" width="400" style="border-radius: 8px; margin-top: 10px;" />
 
 ### 3. شاشة العرض التفاعلية للأطفال (Kiosk Display)
 - **شاشة عرض تلقائية الدوران:** تقوم بعرض إنجازات الأبناء بالتناوب حسب المدة الزمنية المخصصة لكل ابن.
