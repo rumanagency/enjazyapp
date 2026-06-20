@@ -27,6 +27,7 @@ const KioskDisplay = () => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [daysWindow, setDaysWindow] = useState(getWindowDays());
+  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
 
   const cheerAudio = useRef(null);
   const sadAudio = useRef(null);
@@ -288,6 +289,32 @@ const KioskDisplay = () => {
   return (
     <div className="h-screen w-screen bg-[#faece3] overflow-hidden flex flex-col p-2 md:p-4" dir="rtl">
       
+      {!isAudioEnabled && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
+          onClick={() => {
+            if (cheerAudio.current) {
+              cheerAudio.current.play().then(() => {
+                cheerAudio.current.pause();
+                cheerAudio.current.currentTime = 0;
+              }).catch(() => {});
+            }
+            if (sadAudio.current) {
+              sadAudio.current.play().then(() => {
+                sadAudio.current.pause();
+                sadAudio.current.currentTime = 0;
+              }).catch(() => {});
+            }
+            setIsAudioEnabled(true);
+          }}
+        >
+          <div className="bg-white rounded-3xl p-8 md:p-12 text-center shadow-2xl transform transition-transform hover:scale-105">
+            <h2 className="text-3xl md:text-5xl font-bold text-[#49b5d0] mb-4 md:mb-6 animate-pulse">🎵 تفعيل الصوت والشاشة</h2>
+            <p className="text-[#a99c92] text-xl md:text-2xl">انقر في أي مكان للبدء والسماح بتشغيل المؤثرات الصوتية</p>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         <motion.div
           key={activeChild.id}
