@@ -6,6 +6,9 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Pencil, Trash2, Plus, Check, Star, Upload } from 'lucide-react';
 
+const iconModules = import.meta.glob('/public/assets/icons/*.{png,jpg,jpeg,svg,gif}', { eager: true });
+const AVAILABLE_ICONS = Object.keys(iconModules).map(path => path.replace('/public', ''));
+
 const AchievementsManager = () => {
   const { user } = useAuth();
   const [achievements, setAchievements] = useState([]);
@@ -157,32 +160,39 @@ const AchievementsManager = () => {
           {editingId ? 'تعديل الإنجاز' : 'إضافة إنجاز جديد'}
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <Input
-              id="title"
-              label="عنوان الإنجاز"
-              placeholder="مثال: ترتيب السرير"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-              className="flex-1"
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+            <div className="lg:col-span-4">
+              <Input
+                id="title"
+                label="عنوان الإنجاز"
+                placeholder="مثال: ترتيب السرير"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+                className="w-full"
+              />
+            </div>
             
-            <div className="flex-1 flex flex-col gap-2 w-full">
-              <label className="text-[#352c3c] font-bold text-lg px-2">أيقونة الإنجاز (صورة/رابط)</label>
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 px-6 py-4 rounded-3xl border-2 border-[#e2d5cc] bg-white text-[#333333] placeholder-[#a99c92] outline-none transition-all duration-300 focus:border-[#49b5d0] focus:ring-4 focus:ring-[#49b5d0]/20 text-left"
-                  dir="ltr"
-                  placeholder="/assets/icons/quran.png"
-                  value={formData.icon_url}
-                  onChange={(e) => setFormData({ ...formData, icon_url: e.target.value })}
-                  disabled={file !== null}
-                />
+            <div className="lg:col-span-6 flex flex-col gap-2 w-full min-w-0">
+              <label className="text-[#352c3c] font-bold text-lg px-2 whitespace-nowrap">اختر أيقونة الإنجاز أو ارفع صورة</label>
+              <div className="flex gap-2 items-center">
+                <div className="flex-1 flex overflow-x-auto gap-2 p-2 bg-white border-2 border-[#e2d5cc] rounded-3xl items-center scrollbar-hide snap-x">
+                  {AVAILABLE_ICONS.map(iconPath => (
+                    <button
+                      key={iconPath}
+                      type="button"
+                      onClick={() => { setFormData({ ...formData, icon_url: iconPath }); setFile(null); }}
+                      className={`w-12 h-12 shrink-0 p-2 rounded-2xl border-2 transition-all snap-start ${formData.icon_url === iconPath && !file ? 'border-[#49b5d0] bg-[#49b5d0]/10 scale-110 shadow-sm' : 'border-transparent hover:bg-[#faece3]'}`}
+                      title={iconPath.split('/').pop().split('.')[0]}
+                    >
+                      <img src={iconPath} alt={iconPath.split('/').pop()} className="w-full h-full object-contain drop-shadow-sm" />
+                    </button>
+                  ))}
+                </div>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className={`px-4 py-4 rounded-3xl border-2 font-bold transition-all flex items-center justify-center ${file ? 'border-[#488b40] text-[#488b40] bg-[#488b40]/10' : 'border-[#49b5d0] text-[#49b5d0] hover:bg-[#49b5d0]/10'}`}
+                  className={`w-14 h-14 shrink-0 rounded-3xl border-2 font-bold transition-all flex items-center justify-center shadow-sm ${file ? 'border-[#488b40] text-[#488b40] bg-[#488b40]/10' : 'border-[#49b5d0] text-[#49b5d0] hover:bg-[#49b5d0]/10'}`}
                   title="رفع صورة من الجهاز"
                 >
                   <Upload size={24} />
@@ -200,11 +210,11 @@ const AchievementsManager = () => {
                   }}
                 />
               </div>
-              {file && <span className="text-sm text-[#488b40] font-bold px-2">تم اختيار ملف: {file.name}</span>}
+              {file && <span className="text-sm text-[#488b40] font-bold px-2 truncate">تم اختيار ملف: {file.name}</span>}
             </div>
 
-            <div className="flex gap-2 w-full md:w-auto">
-              <Button type="submit" variant="success" className="flex-1 md:flex-none gap-2" disabled={isUploading}>
+            <div className="lg:col-span-2 flex gap-2 w-full">
+              <Button type="submit" variant="success" className="flex-1 gap-2" disabled={isUploading}>
                 {isUploading ? (
                   <span>جاري الرفع...</span>
                 ) : (

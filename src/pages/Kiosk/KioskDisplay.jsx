@@ -298,8 +298,8 @@ const KioskDisplay = () => {
           className="flex-1 w-full flex flex-col bg-white rounded-[3rem] shadow-2xl p-3 md:p-6 border-8 border-[#ffffff]/50 overflow-hidden min-h-0"
         >
           {/* Header - بيانات الابن (بشكل أفقي لتوفير المساحة العمودية) */}
-          <div className="flex flex-row items-center justify-between w-full mb-2 md:mb-4 shrink-0 h-[12vh] max-h-32 px-2 md:px-8">
-            <div className="flex items-center gap-4 md:gap-6 h-full">
+          <div className="flex flex-row items-center justify-between w-full mb-2 md:mb-4 shrink-0 h-[12vh] max-h-32 px-2 md:px-8 gap-4 md:gap-8">
+            <div className="flex items-center gap-4 md:gap-6 h-full shrink-0">
               <div className="h-full aspect-square rounded-full border-4 border-[#faece3] bg-[#f0e6de] overflow-hidden flex items-center justify-center shadow-lg relative">
                 {activeChild.avatar_url ? (
                   <img src={activeChild.avatar_url} alt={activeChild.name} className="w-full h-full object-cover" />
@@ -307,16 +307,16 @@ const KioskDisplay = () => {
                   <span className="text-[clamp(2rem,8vh,5rem)] text-[#a99c92]">{activeChild.name.charAt(0)}</span>
                 )}
               </div>
-              <h1 className="text-[clamp(1.5rem,5vh,4rem)] font-black text-[#352c3c] drop-shadow-sm">{activeChild.name}</h1>
+              <h1 className="text-[clamp(1.5rem,5vh,4rem)] font-black text-[#352c3c] drop-shadow-sm whitespace-nowrap">{activeChild.name}</h1>
             </div>
 
             {/* مسار الإنجاز */}
-            <div className="flex-1 flex flex-col justify-center h-full mr-4 md:mr-12 ml-4 md:ml-8 relative">
-              <div className="flex justify-between items-end mb-1 px-2">
+            <div className="flex-1 flex flex-col justify-center h-full relative">
+              <div className="flex justify-between items-end mb-2 md:mb-4 px-2">
                 <span className="text-[clamp(0.8rem,2vh,1.2rem)] font-bold text-[#f0a63e]">مسار الإنجاز</span>
-                <span className="text-[clamp(0.8rem,2vh,1.2rem)] font-bold text-[#a99c92]">{progress} / {weeklyGoal}</span>
+                <span className="text-[clamp(1rem,2.5vh,1.5rem)] font-bold text-[#a99c92]">{progress} / {weeklyGoal}</span>
               </div>
-              <div className="relative w-full h-4 md:h-6 bg-[#f0e6de] rounded-full mt-4 md:mt-6 border-2 border-[#e2d5cc]">
+              <div className="relative w-full h-4 md:h-6 bg-[#f0e6de] rounded-full border-2 border-[#e2d5cc]">
                 
                 {/* خط التقدم */}
                 <motion.div 
@@ -341,24 +341,22 @@ const KioskDisplay = () => {
                 >
                   <img src="/assets/img/Rabbit Kick Scooter.svg" alt="Rabbit" className="w-full h-full object-contain drop-shadow-md" style={{ transform: 'scaleX(-1)' }} />
                 </motion.div>
-                
-                {/* الميدالية / الهدف */}
-                <motion.div 
-                  className="absolute top-1/2 left-0 z-20 w-[clamp(3rem,7.5vh,5rem)] h-[clamp(3rem,7.5vh,5rem)] md:w-[clamp(3.5rem,8.5vh,6rem)] md:h-[clamp(3.5rem,8.5vh,6rem)] bg-white rounded-full p-1.5 shadow-md border-2 md:border-4 border-[#f0a63e] flex items-center justify-center"
-                  initial={false}
-                  animate={{
-                    x: '-50%',
-                    y: '-50%',
-                    scale: isCompleted ? 1.15 : 1,
-                    borderColor: isCompleted ? '#488b40' : '#f0a63e',
-                    boxShadow: isCompleted ? '0 10px 25px -5px rgba(72,139,64,0.4)' : '0 4px 6px -1px rgba(0,0,0,0.1)'
-                  }}
-                  transition={{ type: "spring", stiffness: 50, damping: 10 }}
-                >
-                  <img src="/assets/img/medal.png" alt="Medal" className="w-full h-full object-contain" />
-                </motion.div>
               </div>
             </div>
+
+            {/* الميدالية / الهدف */}
+            <motion.div 
+              className="h-[clamp(4rem,10vh,6rem)] aspect-square md:h-[clamp(5rem,12vh,8rem)] bg-white rounded-full p-1 md:p-1.5 shadow-md border-2 md:border-4 border-[#f0a63e] flex items-center justify-center shrink-0"
+              initial={false}
+              animate={{
+                scale: isCompleted ? 1.15 : 1,
+                borderColor: isCompleted ? '#488b40' : '#f0a63e',
+                boxShadow: isCompleted ? '0 10px 25px -5px rgba(72,139,64,0.4)' : '0 4px 6px -1px rgba(0,0,0,0.1)'
+              }}
+              transition={{ type: "spring", stiffness: 50, damping: 10 }}
+            >
+              <img src={activeChild.reward_image_url || "/assets/img/medal.png"} alt="Medal" className={`w-full h-full rounded-full ${activeChild.reward_image_url ? 'object-cover' : 'object-contain'}`} />
+            </motion.div>
           </div>
 
           {/* Table - جدول الإنجازات */}

@@ -20,7 +20,6 @@ const DashboardLayout = () => {
     { path: '/dashboard/evaluation', label: 'التقييم اليومي', icon: CalendarCheck },
     { path: '/dashboard/children', label: 'إدارة الأبناء', icon: Users },
     { path: '/dashboard/achievements', label: 'إدارة الإنجازات', icon: Star },
-    { path: '/dashboard/kiosk', label: 'ربط الشاشة', icon: MonitorPlay },
   ];
 
   if (isSuperAdmin) {

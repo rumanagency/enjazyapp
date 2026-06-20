@@ -230,7 +230,27 @@ const DailyEvaluation = () => {
     return <div className="flex gap-2 justify-center my-3">{marks}</div>;
   };
 
-  const progress = Math.max(0, weeklyRecords.filter(r => r.status === 'star').length - weeklyRecords.filter(r => r.status === 'cross').length);
+  const getStartOfWeekDisplay = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - d.getDay()); // Sunday
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+  const startOfWeekDisplay = getStartOfWeekDisplay();
+  const resetTimestampDisplay = activeChild?.path_reset_timestamp ? new Date(activeChild.path_reset_timestamp) : new Date(0);
+  const effectiveStartDateDisplay = resetTimestampDisplay > startOfWeekDisplay ? resetTimestampDisplay : startOfWeekDisplay;
+
+  let validStars = 0;
+  let validCrosses = 0;
+  weeklyRecords.forEach(r => {
+    const recordTime = r.created_at ? new Date(r.created_at) : new Date(r.date);
+    if (recordTime >= effectiveStartDateDisplay) {
+      if (r.status === 'star') validStars++;
+      else if (r.status === 'cross') validCrosses++;
+    }
+  });
+
+  const progress = Math.max(0, validStars - validCrosses);
   const weeklyGoal = activeChild?.weekly_star_goal || 10;
   const progressPercentage = Math.min(100, Math.max(0, (progress / weeklyGoal) * 100));
   const isCompleted = progressPercentage >= 100;
@@ -271,51 +291,55 @@ const DailyEvaluation = () => {
           </div>
 
           {!loading && activeChild && (
-            <Card className="my-6 relative overflow-hidden bg-white shadow-sm border-2 border-[#e2d5cc]">
-              <div className="flex justify-between items-end mb-2 px-2">
-                <span className="font-bold text-[clamp(0.9rem,3vw,1.2rem)] text-[#f0a63e]">مسار إنجاز {activeChild.name}</span>
-                <span className="font-bold text-[clamp(0.9rem,3vw,1.2rem)] text-[#a99c92]">{progress} / {weeklyGoal}</span>
-              </div>
-              
-              <div className="relative w-full h-4 md:h-6 bg-[#f0e6de] rounded-full mt-4 border-2 border-[#e2d5cc]">
-                {/* خط التقدم */}
-                <motion.div 
-                  className="absolute top-0 right-0 h-full bg-gradient-to-l from-[#f0a63e] to-[#f4c88a] rounded-full"
-                  initial={false}
-                  animate={{ width: `${progressPercentage}%` }}
-                  transition={{ type: "spring", stiffness: 50, damping: 10 }}
-                />
-
-                {/* الأرنب */}
-                <motion.div 
-                  className="absolute top-1/2 z-10 w-[clamp(2.5rem,6vh,4.5rem)] h-[clamp(2.5rem,6vh,4.5rem)] md:w-[3.5rem] md:h-[3.5rem]"
-                  initial={false}
-                  animate={{ 
-                    right: `${progressPercentage}%`,
-                    x: '50%',
-                    y: '-50%',
-                    opacity: isCompleted ? 0 : 1,
-                    scale: isCompleted ? 0.5 : 1
-                  }}
-                  transition={{ type: "spring", stiffness: 50, damping: 10 }}
-                >
-                  <img src="/assets/img/Rabbit Kick Scooter.svg" alt="Rabbit" className="w-full h-full object-contain drop-shadow-md" style={{ transform: 'scaleX(-1)' }} />
-                </motion.div>
+            <Card className="my-6 bg-white shadow-sm border-2 border-[#e2d5cc] p-4 md:p-6">
+              <div className="flex flex-row items-center justify-between gap-4 md:gap-8 w-full">
                 
+                {/* مسار الإنجاز */}
+                <div className="flex-1 flex flex-col justify-center relative">
+                  <div className="flex justify-between items-end mb-2 md:mb-4 px-2">
+                    <span className="font-bold text-[clamp(0.9rem,3vw,1.2rem)] text-[#f0a63e]">مسار إنجاز {activeChild.name}</span>
+                    <span className="font-bold text-[clamp(0.9rem,3vw,1.2rem)] text-[#a99c92]">{progress} / {weeklyGoal}</span>
+                  </div>
+                  
+                  <div className="relative w-full h-4 md:h-6 bg-[#f0e6de] rounded-full border-2 border-[#e2d5cc]">
+                    {/* خط التقدم */}
+                    <motion.div 
+                      className="absolute top-0 right-0 h-full bg-gradient-to-l from-[#f0a63e] to-[#f4c88a] rounded-full"
+                      initial={false}
+                      animate={{ width: `${progressPercentage}%` }}
+                      transition={{ type: "spring", stiffness: 50, damping: 10 }}
+                    />
+
+                    {/* الأرنب */}
+                    <motion.div 
+                      className="absolute top-1/2 z-10 w-[clamp(2.5rem,6vh,4.5rem)] h-[clamp(2.5rem,6vh,4.5rem)] md:w-[3.5rem] md:h-[3.5rem]"
+                      initial={false}
+                      animate={{ 
+                        right: `${progressPercentage}%`,
+                        x: '50%',
+                        y: '-50%',
+                        opacity: isCompleted ? 0 : 1,
+                        scale: isCompleted ? 0.5 : 1
+                      }}
+                      transition={{ type: "spring", stiffness: 50, damping: 10 }}
+                    >
+                      <img src="/assets/img/Rabbit Kick Scooter.svg" alt="Rabbit" className="w-full h-full object-contain drop-shadow-md" style={{ transform: 'scaleX(-1)' }} />
+                    </motion.div>
+                  </div>
+                </div>
+
                 {/* الميدالية */}
                 <motion.div 
-                  className="absolute top-1/2 left-0 z-20 w-[clamp(3rem,7.5vh,5rem)] h-[clamp(3rem,7.5vh,5rem)] md:w-[4rem] md:h-[4rem] bg-white rounded-full p-1.5 shadow-md border-2 md:border-4 flex items-center justify-center"
+                  className="w-[clamp(4rem,10vh,6rem)] h-[clamp(4rem,10vh,6rem)] md:w-[5rem] md:h-[5rem] bg-white rounded-full p-1 md:p-1.5 shadow-md border-2 md:border-4 flex items-center justify-center shrink-0"
                   initial={false}
                   animate={{
-                    x: '-50%',
-                    y: '-50%',
                     scale: isCompleted ? 1.15 : 1,
                     borderColor: isCompleted ? '#488b40' : '#f0a63e',
                     boxShadow: isCompleted ? '0 10px 25px -5px rgba(72,139,64,0.4)' : '0 4px 6px -1px rgba(0,0,0,0.1)'
                   }}
                   transition={{ type: "spring", stiffness: 50, damping: 10 }}
                 >
-                  <img src="/assets/img/medal.png" alt="Medal" className="w-full h-full object-contain" />
+                  <img src={activeChild.reward_image_url || "/assets/img/medal.png"} alt="Medal" className={`w-full h-full rounded-full ${activeChild.reward_image_url ? 'object-cover' : 'object-contain'}`} />
                 </motion.div>
               </div>
             </Card>

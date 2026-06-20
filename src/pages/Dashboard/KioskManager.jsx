@@ -108,7 +108,7 @@ const KioskManager = () => {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center kiosk-manager-header">
         <h1 className="text-3xl font-bold text-[#352c3c]">ربط الشاشة الرئيسية</h1>
       </div>
 

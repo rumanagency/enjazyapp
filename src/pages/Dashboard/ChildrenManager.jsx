@@ -10,11 +10,13 @@ const ChildrenManager = () => {
   const { user } = useAuth();
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ name: '', avatar_url: '', kiosk_duration: 10, weekly_star_goal: 10 });
+  const [formData, setFormData] = useState({ name: '', avatar_url: '', reward_image_url: '', kiosk_duration: 10, weekly_star_goal: 10 });
   const [editingId, setEditingId] = useState(null);
   const [file, setFile] = useState(null);
+  const [rewardFile, setRewardFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const rewardInputRef = useRef(null);
 
   useEffect(() => {
     fetchChildren();
@@ -58,15 +60,19 @@ const ChildrenManager = () => {
     try {
       setIsUploading(true);
       let finalAvatarUrl = formData.avatar_url;
+      let finalRewardUrl = formData.reward_image_url;
 
       if (file) {
         finalAvatarUrl = await uploadFile(file);
+      }
+      if (rewardFile) {
+        finalRewardUrl = await uploadFile(rewardFile);
       }
 
       if (editingId) {
         const { error } = await supabase
           .from('children')
-          .update({ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration, weekly_star_goal: formData.weekly_star_goal })
+          .update({ name: formData.name, avatar_url: finalAvatarUrl, reward_image_url: finalRewardUrl, kiosk_duration: formData.kiosk_duration, weekly_star_goal: formData.weekly_star_goal })
           .eq('id', editingId);
         if (error) throw error;
       } else {
@@ -76,7 +82,7 @@ const ChildrenManager = () => {
         }
         const { error } = await supabase
           .from('children')
-          .insert([{ name: formData.name, avatar_url: finalAvatarUrl, kiosk_duration: formData.kiosk_duration, weekly_star_goal: formData.weekly_star_goal, parent_id: user.id }]);
+          .insert([{ name: formData.name, avatar_url: finalAvatarUrl, reward_image_url: finalRewardUrl, kiosk_duration: formData.kiosk_duration, weekly_star_goal: formData.weekly_star_goal, parent_id: user.id }]);
         if (error) throw error;
       }
       resetForm();
@@ -90,16 +96,19 @@ const ChildrenManager = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', avatar_url: '', kiosk_duration: 10, weekly_star_goal: 10 });
+    setFormData({ name: '', avatar_url: '', reward_image_url: '', kiosk_duration: 10, weekly_star_goal: 10 });
     setEditingId(null);
     setFile(null);
+    setRewardFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (rewardInputRef.current) rewardInputRef.current.value = '';
   };
 
   const handleEdit = (child) => {
-    setFormData({ name: child.name, avatar_url: child.avatar_url || '', kiosk_duration: child.kiosk_duration || 10, weekly_star_goal: child.weekly_star_goal || 10 });
+    setFormData({ name: child.name, avatar_url: child.avatar_url || '', reward_image_url: child.reward_image_url || '', kiosk_duration: child.kiosk_duration || 10, weekly_star_goal: child.weekly_star_goal || 10 });
     setEditingId(child.id);
     setFile(null);
+    setRewardFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -143,9 +152,9 @@ const ChildrenManager = () => {
         <h2 className="text-xl font-bold text-[#f0a63e] mb-4">
           {editingId ? 'تعديل بيانات الابن' : 'إضافة ابن جديد'}
         </h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex flex-col gap-4 flex-1">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-5 flex flex-col gap-4">
               <Input
                 id="name"
                 label="اسم الابن"
@@ -154,7 +163,7 @@ const ChildrenManager = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input
                   id="kiosk_duration"
                   type="number"
@@ -181,58 +190,84 @@ const ChildrenManager = () => {
                 />
               </div>
             </div>
-            <div className="flex-1 flex flex-col gap-2 w-full justify-start">
-              <label className="text-[#352c3c] font-bold text-lg px-2">رابط الصورة (اختياري)</label>
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 px-6 py-4 rounded-3xl border-2 border-[#e2d5cc] bg-white text-[#333333] placeholder-[#a99c92] outline-none transition-all duration-300 focus:border-[#49b5d0] focus:ring-4 focus:ring-[#49b5d0]/20 text-left"
-                  dir="ltr"
-                  placeholder="https://..."
-                  value={formData.avatar_url}
-                  onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                  disabled={file !== null}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`px-4 py-4 rounded-3xl border-2 font-bold transition-all flex items-center justify-center ${file ? 'border-[#488b40] text-[#488b40] bg-[#488b40]/10' : 'border-[#49b5d0] text-[#49b5d0] hover:bg-[#49b5d0]/10'}`}
-                  title="رفع صورة من الجهاز"
-                >
-                  <Upload size={24} />
-                </button>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setFile(e.target.files[0]);
-                      setFormData({ ...formData, avatar_url: '' });
-                    }
-                  }}
-                />
-              </div>
-              {file && <span className="text-sm text-[#488b40] font-bold px-2">تم اختيار ملف: {file.name}</span>}
-            </div>
             
-            <div className="flex gap-2 w-full md:w-auto">
-              <Button type="submit" variant="primary" className="flex-1 md:flex-none gap-2" disabled={isUploading}>
-                {isUploading ? (
-                  <span>جاري الرفع...</span>
-                ) : (
-                  <>
-                    <Plus size={20} />
-                    <span>{editingId ? 'تحديث' : 'إضافة'}</span>
-                  </>
-                )}
-              </Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={resetForm} disabled={isUploading}>
-                  إلغاء
-                </Button>
-              )}
+            <div className="lg:col-span-7 flex flex-col md:flex-row gap-4 w-full">
+              <div className="flex-1 flex flex-col gap-2 w-full justify-start">
+                <label className="text-[#352c3c] font-bold text-lg px-2 whitespace-nowrap">صورة الابن (اختياري)</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex-1 px-4 py-4 rounded-3xl border-2 font-bold transition-all flex items-center justify-center gap-2 ${file ? 'border-[#488b40] text-[#488b40] bg-[#488b40]/10' : 'border-[#49b5d0] text-[#49b5d0] hover:bg-[#49b5d0]/10'}`}
+                    title="رفع صورة من الجهاز"
+                  >
+                    <Upload size={24} />
+                    <span>{file ? 'تم اختيار صورة للتحديث' : (formData.avatar_url ? 'تحديث الصورة' : 'رفع صورة من الجهاز')}</span>
+                  </button>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setFile(e.target.files[0]);
+                        setFormData({ ...formData, avatar_url: '' });
+                      }
+                    }}
+                  />
+                </div>
+                {file && <span className="text-sm text-[#488b40] font-bold px-2 truncate">تم اختيار ملف: {file.name}</span>}
+                {!file && formData.avatar_url && <span className="text-sm text-[#49b5d0] font-bold px-2">توجد صورة مسجلة مسبقاً</span>}
+              </div>
+
+              <div className="flex-1 flex flex-col gap-2 w-full justify-start">
+                <label className="text-[#352c3c] font-bold text-lg px-2 whitespace-nowrap">صورة الإنجاز (الميدالية)</label>
+                <div className="flex gap-2 items-center">
+                  <button
+                    type="button"
+                    onClick={() => rewardInputRef.current?.click()}
+                    className={`flex-1 px-4 py-4 rounded-3xl border-2 font-bold transition-all flex items-center justify-center gap-2 ${rewardFile ? 'border-[#488b40] text-[#488b40] bg-[#488b40]/10' : 'border-[#f0a63e] text-[#f0a63e] hover:bg-[#f0a63e]/10'}`}
+                    title="رفع صورة للإنجاز بدلاً من الميدالية"
+                  >
+                    <Upload size={24} />
+                    <span>{rewardFile ? 'تم اختيار صورة للإنجاز' : (formData.reward_image_url ? 'تحديث صورة الإنجاز' : 'صورة الإنجاز (اختياري)')}</span>
+                  </button>
+                  <input 
+                    type="file" 
+                    ref={rewardInputRef} 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setRewardFile(e.target.files[0]);
+                        setFormData({ ...formData, reward_image_url: '' });
+                      }
+                    }}
+                  />
+                </div>
+                {rewardFile && <span className="text-sm text-[#488b40] font-bold px-2 truncate">تم اختيار ملف: {rewardFile.name}</span>}
+                {!rewardFile && formData.reward_image_url && <span className="text-sm text-[#f0a63e] font-bold px-2">توجد صورة إنجاز مسجلة</span>}
+              </div>
             </div>
+          </div>
+          
+          <div className="flex gap-4 w-full md:w-1/3 mt-2">
+            <Button type="submit" variant="primary" className="flex-1 gap-2" disabled={isUploading}>
+              {isUploading ? (
+                <span>جاري الرفع...</span>
+              ) : (
+                <>
+                  <Plus size={20} />
+                  <span>{editingId ? 'تحديث بيانات الابن' : 'إضافة ابن'}</span>
+                </>
+              )}
+            </Button>
+            {editingId && (
+              <Button type="button" variant="outline" onClick={resetForm} disabled={isUploading} className="flex-1">
+                إلغاء
+              </Button>
+            )}
           </div>
         </form>
       </Card>
